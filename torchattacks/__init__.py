@@ -1,6 +1,7 @@
 # None attacks
 from .attacks.vanila import VANILA
 from .attacks.gn import GN
+from .attacks.jbda import JBDA
 
 # Linf attacks
 from .attacks.fgsm import FGSM
@@ -55,6 +56,7 @@ __version__ = "3.5.1"
 __all__ = [
     "VANILA",
     "GN",
+    "JBDA",
     "FGSM",
     "BIM",
     "RFGSM",
