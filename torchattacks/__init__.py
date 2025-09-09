@@ -8,6 +8,8 @@ from .attacks.fgsm import FGSM
 from .attacks.bim import BIM
 from .attacks.rfgsm import RFGSM
 from .attacks.pgd import PGD
+from .attacks.featurefool import FeatureFool
+from .attacks.featureadversary import FeatureAdversary
 from .attacks.eotpgd import EOTPGD
 from .attacks.ffgsm import FFGSM
 from .attacks.tpgd import TPGD
@@ -61,6 +63,8 @@ __all__ = [
     "BIM",
     "RFGSM",
     "PGD",
+    "FeatureFool",
+    "FeatureAdversary",
     "EOTPGD",
     "FFGSM",
     "TPGD",
