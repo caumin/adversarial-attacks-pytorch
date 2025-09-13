@@ -7,13 +7,25 @@ class FeatureAdversary(Attack):
     Creates adversarial examples by minimizing the feature distance 
     to a target guide image.
     """
-    def __init__(self, model, feature_fn, eps=8/255, alpha=2/255, steps=10):
+    def __init__(self, model, eps=8/255, alpha=2/255, steps=10):
         super().__init__("FeatureAdversary", model)
-        self.feature_fn = feature_fn # Function to extract features
         self.eps = eps
         self.alpha = alpha
         self.steps = steps
         self.supported_mode = ["targeted"] # This is a targeted attack
+    
+    def _get_features(self, images):
+        """
+        Helper to get features from the model.
+        Assumes the model's forward method supports `return_features=True`
+        and returns a tuple (logits, features).
+        """
+        # This check is important for ensuring the model is compatible.
+        if not (hasattr(self.model, 'forward') and 'return_features' in self.model.forward.__code__.co_varnames):
+            raise ValueError("The model for FeatureFool must support `return_features=True` in its forward method.")
+        
+        _, features = self.model(images, return_features=True)
+        return features
 
     def forward(self, images, guides):
         """
@@ -30,11 +42,11 @@ class FeatureAdversary(Attack):
         # <<< MODIFIED: Target feature calculation moved outside the loop for efficiency >>>
         # The target features are constant throughout the iterative process.
         with torch.no_grad():
-            target_features = self.feature_fn(guides).detach()
+            target_features = self._get_features(guides).detach()
 
         for _ in range(self.steps):
             adv_images.requires_grad = True
-            current_features = self.feature_fn(adv_images)
+            current_features = self._get_features(adv_images)
 
             # Loss: Minimize the L2 distance (using MSE) between current and target features
             loss = nn.MSELoss()(current_features, target_features)
